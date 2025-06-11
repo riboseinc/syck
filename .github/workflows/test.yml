@@ -37,6 +37,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
+        rubygems: 3.2.3
     - name: Set up bison on macOS
       if: matrix.os == 'macos-latest' || matrix.os == 'macos-13'
       run: |
