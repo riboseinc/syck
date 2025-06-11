@@ -1413,21 +1413,29 @@ static void
 syck_node_mark(SyckNode *n)
 {
     int i;
+
+    /* Check for NULL pointer to prevent segfaults */
+    if ( n == NULL ) return;
+
     rb_gc_mark_maybe( n->id );
     switch ( n->kind )
     {
         case syck_seq_kind:
-            for ( i = 0; i < n->data.list->idx; i++ )
-            {
-                rb_gc_mark( syck_seq_read( n, i ) );
+            if ( n->data.list != NULL ) {
+                for ( i = 0; i < n->data.list->idx; i++ )
+                {
+                    rb_gc_mark( syck_seq_read( n, i ) );
+                }
             }
         break;
 
         case syck_map_kind:
-            for ( i = 0; i < n->data.pairs->idx; i++ )
-            {
-                rb_gc_mark( syck_map_read( n, map_key, i ) );
-                rb_gc_mark( syck_map_read( n, map_value, i ) );
+            if ( n->data.pairs != NULL ) {
+                for ( i = 0; i < n->data.pairs->idx; i++ )
+                {
+                    rb_gc_mark( syck_map_read( n, map_key, i ) );
+                    rb_gc_mark( syck_map_read( n, map_value, i ) );
+                }
             }
         break;
 
