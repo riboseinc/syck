@@ -1,3 +1,4 @@
+%require "3.8"
 %start doc
 %define api.pure
 
