@@ -74,7 +74,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 35 "gram.y"
+#line 36 "gram.y"
 
     SYMID nodeId;
     SyckNode *nodeData;

@@ -1,6 +1,12 @@
 name: test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+  pull_request:
 
 jobs:
   ruby-versions:
@@ -13,6 +19,7 @@ jobs:
     needs: ruby-versions
     name: Test with (${{ matrix.ruby }} / ${{ matrix.os }})
     strategy:
+      fail-fast: false
       matrix:
         ruby: ${{ fromJson(needs.ruby-versions.outputs.versions) }}
         os: [ubuntu-latest, macos-latest]
@@ -29,7 +36,21 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-    - name: Install dependencies
-      run: bundle install
-    - name: Run test
-      run: rake
+        bundler-cache: true
+        rubygems: 3.2.3
+    - name: Set up bison on macOS
+      if: matrix.os == 'macos-latest' || matrix.os == 'macos-13'
+      run: |
+        brew install bison
+        brew link bison --force
+    - name: Build with grammar generation on macOS
+      if: matrix.os == 'macos-latest' || matrix.os == 'macos-13'
+      run: |
+        export PATH="$(brew --prefix bison)/bin:$PATH"
+        bundle exec rake dev_build
+    - name: Build with grammar generation
+      if: matrix.os != 'macos-latest' && matrix.os != 'macos-13'
+      run: |
+        bundle exec rake dev_build
+    - name: Run tests
+      run: bundle exec rake test

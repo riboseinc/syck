@@ -145,6 +145,13 @@ syck_st_free_anchors( st_data_t key, st_data_t name, st_data_t arg )
     return ST_CONTINUE;
 }
 
+/* Wrapper function with correct signature for st_foreach callback */
+static int
+syck_st_free_anchors_wrapper( st_data_t key, st_data_t name, st_data_t arg )
+{
+    return syck_st_free_anchors( key, name, arg );
+}
+
 void
 syck_emitter_st_free( SyckEmitter *e )
 {
@@ -153,7 +160,7 @@ syck_emitter_st_free( SyckEmitter *e )
      */
     if ( e->anchors != NULL )
     {
-        st_foreach( e->anchors, syck_st_free_anchors, 0 );
+        st_foreach( e->anchors, syck_st_free_anchors_wrapper, 0 );
         st_free_table( e->anchors );
         e->anchors = NULL;
     }
